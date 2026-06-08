@@ -16,7 +16,7 @@ export function buildHelloMessageText(username, config) {
 
   return `Приветствую, ${username}! Я автоматический координатор свадьбы, модель ${modelCode}, сокращенно ${shortName}. 🤖
 
-${config.bride_name} и ${config.groom_name} рады пригласить вас на свою свадьбу, которая состоится ${config.wedding_date} в ${config.city}! 💍✨
+${config.groom_name} и ${config.bride_name} рады пригласить вас на свою свадьбу, которая состоится ${config.wedding_date} в ${config.city}! 💍✨
 
 Я расскажу о всех подробностях предстоящего события, напомню о начале церемонии и подскажу, где пройдет банкет. 🥂
 
