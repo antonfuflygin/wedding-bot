@@ -77,7 +77,7 @@ export async function handleEventLocationCallback(ctx, action, timeZone) {
     }
 
     if (arrivalTime) {
-      timeMessageParts.push(`СБОР ГОСТЕЙ В ${arrivalTime}!`);
+      timeMessageParts.push(`📣 СБОР ГОСТЕЙ В ${arrivalTime}`);
     }
 
     await ctx.reply(timeMessageParts.join("\n\n"));
