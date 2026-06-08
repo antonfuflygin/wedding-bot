@@ -1,16 +1,18 @@
 services:
   db:
     image: postgres:16-alpine
+    env_file:
+      - .env
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
-      POSTGRES_DB: ${POSTGRES_DB:-wedding_bot}
+      POSTGRES_USER: ${POSTGRES_USER?POSTGRES_USER is required in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD?POSTGRES_PASSWORD is required in .env}
+      POSTGRES_DB: ${POSTGRES_DB?POSTGRES_DB is required in .env}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./dump.sql:/seed/dump.sql:ro
       - ./docker/init-db.sh:/docker-entrypoint-initdb.d/01-init-db.sh:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-wedding_bot}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER?POSTGRES_USER is required in .env} -d ${POSTGRES_DB?POSTGRES_DB is required in .env}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -21,7 +23,8 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-wedding_bot}
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
     depends_on:
       db:
         condition: service_healthy

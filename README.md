@@ -20,7 +20,11 @@ Set these values:
 
 ```env
 BOT_TOKEN=your_telegram_bot_token_here
-DATABASE_URL=postgres://postgres:password@localhost:5432/wedding_bot
+POSTGRES_USER=your_postgres_user
+POSTGRES_PASSWORD=your_postgres_password
+POSTGRES_DB=wedding_bot_db
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
 WEDDING_BRIDE_NAME=Имя1
 WEDDING_GROOM_NAME=Имя2
 WEDDING_DATE=25.06.26
@@ -41,7 +45,7 @@ npm run dev
 
 ## Docker
 
-Copy `.env.example` to `.env`, set `BOT_TOKEN` and wedding config, then start the bot with PostgreSQL:
+Copy `.env.example` to `.env`, set `BOT_TOKEN`, `POSTGRES_*` credentials, and wedding config, then start the bot with PostgreSQL:
 
 ```bash
 cp .env.example .env
@@ -66,13 +70,15 @@ PostgreSQL data is stored in the `postgres_data` Docker volume. To remove it as 
 docker compose down -v
 ```
 
-Optional PostgreSQL variables for Docker Compose (defaults are shown):
+Required PostgreSQL variables in `.env`:
 
 ```env
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=password
-POSTGRES_DB=wedding_bot
+POSTGRES_USER=your_postgres_user
+POSTGRES_PASSWORD=your_postgres_password
+POSTGRES_DB=wedding_bot_db
 ```
+
+Docker Compose sets `POSTGRES_HOST=db` for the bot container automatically.
 
 ## Admin Broadcast
 
@@ -86,7 +92,7 @@ The bot sends the message to every saved chat from PostgreSQL.
 
 ## Database
 
-The bot creates the required tables automatically on startup. You can configure PostgreSQL with `DATABASE_URL` or with separate `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD` values.
+The bot creates the required tables automatically on startup. PostgreSQL connection is built from `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `POSTGRES_HOST`, and `POSTGRES_PORT`.
 
 ### Wedding config
 
