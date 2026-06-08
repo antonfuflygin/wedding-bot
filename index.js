@@ -1,6 +1,5 @@
 import "dotenv/config";
 import { Bot } from "grammy";
-import cron from "node-cron";
 import { createMainKeyboard, CALLBACK_ACTIONS } from "./keyboards/mainKeyboard.js";
 import { setupBotMenu } from "./keyboards/botMenu.js";
 import { broadcastMessage } from "./services/broadcastService.js";
@@ -10,19 +9,10 @@ import { isUserAdmin, saveUser } from "./services/userService.js";
 import { buildHelloMessageText, getWeddingConfig } from "./services/weddingConfigService.js";
 
 const { BOT_TOKEN } = process.env;
-
-const DAILY_MESSAGE_CRON = process.env.DAILY_MESSAGE_CRON || "0 10 * * *";
-const CRON_TIMEZONE = process.env.CRON_TIMEZONE || "Europe/Moscow";
-const DAILY_MESSAGE_TEXT =
-  process.env.DAILY_MESSAGE_TEXT ||
-  "Доброе утро! Напоминаем, что вся важная информация о свадьбе доступна в меню бота.";
+const TIMEZONE = process.env.TIMEZONE || "Europe/Moscow";
 
 if (!BOT_TOKEN) {
   throw new Error("BOT_TOKEN is required. Add it to your .env file.");
-}
-
-if (!cron.validate(DAILY_MESSAGE_CRON)) {
-  throw new Error(`Invalid DAILY_MESSAGE_CRON expression: ${DAILY_MESSAGE_CRON}`);
 }
 
 const bot = new Bot(BOT_TOKEN);
@@ -76,7 +66,7 @@ bot.command("palace", async (ctx) => {
   console.log(`[bot] /palace from ${ctx.from?.id}`);
 
   try {
-    await handleEventLocationCallback(ctx, CALLBACK_ACTIONS.PALACE, CRON_TIMEZONE);
+    await handleEventLocationCallback(ctx, CALLBACK_ACTIONS.PALACE, TIMEZONE);
   } catch (error) {
     console.error("[bot] Failed to handle /palace:", error);
     await ctx.reply("Не удалось получить информацию о ЗАГС. Попробуйте позже.");
@@ -87,7 +77,7 @@ bot.command("restaurant", async (ctx) => {
   console.log(`[bot] /restaurant from ${ctx.from?.id}`);
 
   try {
-    await handleEventLocationCallback(ctx, CALLBACK_ACTIONS.RESTAURANT, CRON_TIMEZONE);
+    await handleEventLocationCallback(ctx, CALLBACK_ACTIONS.RESTAURANT, TIMEZONE);
   } catch (error) {
     console.error("[bot] Failed to handle /restaurant:", error);
     await ctx.reply("Не удалось получить информацию о ресторане. Попробуйте позже.");
@@ -135,7 +125,7 @@ bot.callbackQuery(CALLBACK_ACTIONS.PALACE, async (ctx) => {
   await ctx.answerCallbackQuery();
 
   try {
-    await handleEventLocationCallback(ctx, CALLBACK_ACTIONS.PALACE, CRON_TIMEZONE);
+    await handleEventLocationCallback(ctx, CALLBACK_ACTIONS.PALACE, TIMEZONE);
   } catch (error) {
     console.error("[callback] Failed to handle palace action:", error);
     await ctx.reply("Не удалось получить информацию о ЗАГС. Попробуйте позже.");
@@ -147,7 +137,7 @@ bot.callbackQuery(CALLBACK_ACTIONS.RESTAURANT, async (ctx) => {
   await ctx.answerCallbackQuery();
 
   try {
-    await handleEventLocationCallback(ctx, CALLBACK_ACTIONS.RESTAURANT, CRON_TIMEZONE);
+    await handleEventLocationCallback(ctx, CALLBACK_ACTIONS.RESTAURANT, TIMEZONE);
   } catch (error) {
     console.error("[callback] Failed to handle restaurant action:", error);
     await ctx.reply("Не удалось получить информацию о ресторане. Попробуйте позже.");
@@ -181,13 +171,6 @@ bot.on("message", async (ctx) => {
   await sendMainMenu(ctx, "Спасибо за сообщение! Выберите действие:");
 });
 
-cron.schedule(DAILY_MESSAGE_CRON, async () => {
-  console.log(`[cron] Scheduled broadcast started: ${DAILY_MESSAGE_CRON}`);
-  await broadcastMessage(bot, DAILY_MESSAGE_TEXT);
-}, {
-  timezone: CRON_TIMEZONE
-});
-
 bot.catch((error) => {
   console.error("[bot] Unhandled bot error:", error);
 });
@@ -213,7 +196,6 @@ process.once("SIGTERM", () => {
 });
 
 console.log("[bot] Starting bot...");
-console.log(`[cron] Daily message schedule: ${DAILY_MESSAGE_CRON} (${CRON_TIMEZONE})`);
 
 await initializeDatabase();
 await setupBotMenu(bot);

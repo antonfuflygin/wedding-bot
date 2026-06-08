@@ -21,9 +21,10 @@ Set these values:
 ```env
 BOT_TOKEN=your_telegram_bot_token_here
 DATABASE_URL=postgres://postgres:password@localhost:5432/wedding_bot
-DAILY_MESSAGE_CRON=0 10 * * *
-CRON_TIMEZONE=Europe/Moscow
-DAILY_MESSAGE_TEXT=Доброе утро! Напоминаем, что вся важная информация о свадьбе доступна в меню бота.
+WEDDING_BRIDE_NAME=Имя1
+WEDDING_GROOM_NAME=Имя2
+WEDDING_DATE=25.06.26
+WEDDING_CITY=Город
 ```
 
 ## Run
@@ -118,9 +119,3 @@ To grant admin rights, set `is_admin = true` for a user after they run `/start`:
 ```sql
 UPDATE users SET is_admin = true WHERE telegram_user_id = 123456789;
 ```
-
-## Scheduled Messages
-
-The schedule is configured by `DAILY_MESSAGE_CRON`. The default value sends a message every day at 10:00 in `CRON_TIMEZONE`.
-
-Each failed send is logged, and the broadcast continues for the remaining users.
