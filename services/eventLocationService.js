@@ -4,7 +4,7 @@ export async function getEventLocation(action) {
   try {
     const result = await pool.query(
       `
-        SELECT action, latitude, longitude, map_url, starts_at
+        SELECT action, latitude, longitude, map_url, starts_at, arrival
         FROM event_locations
         WHERE action = $1
       `,

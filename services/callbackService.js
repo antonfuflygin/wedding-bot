@@ -13,8 +13,8 @@ const EVENT_INFO = {
   }
 };
 
-function formatStartTime(startsAt, timeZone) {
-  if (!startsAt) {
+function formatEventTime(dateTime, timeZone) {
+  if (!dateTime) {
     return null;
   }
 
@@ -22,7 +22,19 @@ function formatStartTime(startsAt, timeZone) {
     dateStyle: "long",
     timeStyle: "short",
     timeZone
-  }).format(new Date(startsAt));
+  }).format(new Date(dateTime));
+}
+
+function formatEventClockTime(dateTime, timeZone) {
+  if (!dateTime) {
+    return null;
+  }
+
+  return new Intl.DateTimeFormat("ru-RU", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone
+  }).format(new Date(dateTime));
 }
 
 function formatAdminContact(admin) {
@@ -44,7 +56,8 @@ export async function handleEventLocationCallback(ctx, action, timeZone) {
     return;
   }
 
-  const startTime = formatStartTime(location.starts_at, timeZone);
+  const startTime = formatEventTime(location.starts_at, timeZone);
+  const arrivalTime = formatEventClockTime(location.arrival, timeZone);
 
   await ctx.reply(`📍 ${eventInfo.title}\n\n${eventInfo.description}`);
 
@@ -56,8 +69,18 @@ export async function handleEventLocationCallback(ctx, action, timeZone) {
     await ctx.reply(`🗺 Карта: ${location.map_url}`);
   }
 
-  if (startTime) {
-    await ctx.reply(`🕐 ${eventInfo.title} — начало: ${startTime}`);
+  if (startTime || arrivalTime) {
+    const timeMessageParts = [];
+
+    if (startTime) {
+      timeMessageParts.push(`🕐 ${eventInfo.title} — начало: ${startTime}`);
+    }
+
+    if (arrivalTime) {
+      timeMessageParts.push(`СБОР ГОСТЕЙ В ${arrivalTime}!`);
+    }
+
+    await ctx.reply(timeMessageParts.join("\n\n"));
   }
 }
 
