@@ -38,6 +38,41 @@ For development with Node.js watch mode:
 npm run dev
 ```
 
+## Docker
+
+Copy `.env.example` to `.env`, set `BOT_TOKEN` and wedding config, then start the bot with PostgreSQL:
+
+```bash
+cp .env.example .env
+docker compose up -d --build
+```
+
+View logs:
+
+```bash
+docker compose logs -f bot
+```
+
+Stop:
+
+```bash
+docker compose down
+```
+
+PostgreSQL data is stored in the `postgres_data` Docker volume. To remove it as well:
+
+```bash
+docker compose down -v
+```
+
+Optional PostgreSQL variables for Docker Compose (defaults are shown):
+
+```env
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=password
+POSTGRES_DB=wedding_bot
+```
+
 ## Admin Broadcast
 
 Only users with `is_admin = true` in the database can run:
